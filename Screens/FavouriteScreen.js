@@ -60,7 +60,7 @@ function FavouritesScreen() {
             <Pressable style={styles.gridItem} onPress={() => handleMoviePress(item)}>
                 <Image style={styles.image} source={{ uri: imageUri }} />
                 <Pressable style={styles.deleteIconContainer} onPress={() => deleteMovie(item)}>
-                    <AntDesign name="close" size={18} color="red" />
+                    <AntDesign name="close" size={17} color="white" />
                 </Pressable>
                 <View >
                     <Text style={styles.title}>{item.title}</Text>
@@ -132,8 +132,12 @@ const styles = StyleSheet.create({
     },
     deleteIconContainer: {
         position: 'absolute',
-        top: 10,
-        right: 10,
+        top: 8,
+        right: 8,
+        backgroundColor: 'red',
+        borderRadius: 30,
+        width: 17,
+
     },
     itemContent: {
         flex: 1,
@@ -145,6 +149,7 @@ const styles = StyleSheet.create({
         height: 180,
         borderRadius: 6,
         marginBottom: 10,
+        resizeMode: 'stretch'
     },
     title: {
         fontSize: 16,

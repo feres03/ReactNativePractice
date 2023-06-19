@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
@@ -6,17 +6,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { FavouritesContext } from '../store/context/FavouritesContext';
 
 const DetailsGridTile = () => {
+    // useContext to access the FavouritesContext.
     const favouriteMoviescontext = useContext(FavouritesContext);
-
-    const navigation = useNavigation();
+    // access the navigation object and route params
     const route = useRoute();
     const { movie } = route.params;
 
     const [movieDetails, setMovieDetails] = useState(null);
-    const [isFavorite, setIsFavorite] = useState(false);
 
     const movieIsFavourite = favouriteMoviescontext.ids.includes(movie.id)
-
+    // fetch the informations of the movie from the API
     useEffect(() => {
         const fetchMovieDetails = async () => {
             try {
@@ -32,7 +31,7 @@ const DetailsGridTile = () => {
 
         fetchMovieDetails();
     }, [movie.id]);
-
+    // function is called when the favorite icon is pressed(either added or deleted from the favorites)
     const changeFavouriteStatusHandler = () => {
         if (movieIsFavourite) {
             favouriteMoviescontext.deleteFavourite(movie.id)
@@ -43,6 +42,7 @@ const DetailsGridTile = () => {
     };
 
     return (
+        // the movie details displaying
         <ScrollView contentContainerStyle={styles.container}>
             {movieDetails ? (
                 <>
@@ -52,9 +52,7 @@ const DetailsGridTile = () => {
                             style={styles.poster}
                         />
                         <TouchableOpacity onPress={changeFavouriteStatusHandler} style={styles.favoriteIcon}>
-                            <Ionicons name={movieIsFavourite ? 'heart' : 'heart-outline'} size={28} color="#C89F9C" />
-                            {/* {isFavorite && <Ionicons name="add" size={12} color="white" style={styles.plusIcon} />} */}
-                            {isFavorite && <Text style={styles.plusIcon}>Added to favourites</Text>}
+                            <Ionicons name={movieIsFavourite ? 'heart' : 'heart-outline'} size={28} color="white" />
 
                         </TouchableOpacity>
                     </View>
@@ -110,10 +108,6 @@ const styles = StyleSheet.create({
         top: 8,
         right: 8,
         alignItems: 'center',
-    },
-    plusIcon: {
-        color: 'white',
-        fontWeight: 'bold',
     },
     titleContainer: {
         flexDirection: 'row',

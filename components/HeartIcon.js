@@ -9,7 +9,7 @@ function HeartIcon() {
         navigation.navigate('Favourites');
     };
     return (
-        <Pressable onPress={handleHeartPress} style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}>
+        <Pressable onPress={handleHeartPress}>
             <Icon name="heart" size={22} color="#DE2E4B" style={{ marginRight: 10 }} />
         </Pressable>
     )

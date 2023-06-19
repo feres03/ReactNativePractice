@@ -7,10 +7,11 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 function HomeGridTile() {
     const navigation = useNavigation();
+
     const [movies, setMovies] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Searching for a movie using filter methode
+    // Searching for a movie using filter method
     const handleSearch = (text) => {
         if (text === '') {
             setSearchQuery('');
@@ -84,6 +85,9 @@ function HomeGridTile() {
 export default HomeGridTile;
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#B36A5E'
+    },
     searchIcon: {
         marginRight: 8,
         marginHorizontal: 10,
@@ -100,10 +104,6 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 20,
     },
-    container: {
-        backgroundColor: '#B36A5E'
-    },
-
     gridItem: {
         flex: 1,
         margin: 10,
