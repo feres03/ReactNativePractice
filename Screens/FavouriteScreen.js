@@ -21,16 +21,9 @@ function FavouritesScreen() {
             console.log(error);
         }
     };
-
     useEffect(() => {
         fetchMovies();
     }, []);
-
-    useEffect(() => {
-        if (selectedMovie) {
-            setMovies(prevMovies => prevMovies.filter(movie => movie.id !== selectedMovie.id));
-        }
-    }, [selectedMovie]);
 
     // Navigate to the movie details screen
     const handleMoviePress = (movie) => {
@@ -42,15 +35,12 @@ function FavouritesScreen() {
         setSelectedMovie(movie);
         setModalVisible(true);
     };
-
     // Confirm delete action
     const confirmDelete = () => {
         favouriteMoviesContext.deleteFavourite(selectedMovie.id);
         setMovies(movies => movies.filter(movie => movie.id !== selectedMovie.id));
-        setSelectedMovie(null);
         setModalVisible(false);
     };
-
 
 
     const renderItem = ({ item }) => {
@@ -149,7 +139,7 @@ const styles = StyleSheet.create({
         height: 180,
         borderRadius: 6,
         marginBottom: 10,
-        resizeMode: 'stretch'
+        resizeMode: 'contain'
     },
     title: {
         fontSize: 16,

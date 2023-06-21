@@ -2,11 +2,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-
 import HomeScreen from './Screens/HomeScreen';
 import DetailsScreen from './Screens/DetailsScreen';
 import FavouritesScreen from './Screens/FavouriteScreen';
 import HeartIcon from './components/HeartIcon';
+
 import FavouritesContextProvider from './store/context/FavouritesContext';
 
 export default function App() {
@@ -30,6 +30,8 @@ export default function App() {
             <Stack.Screen name='Favourites' component={FavouritesScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+
+
       </FavouritesContextProvider>
     </>
   );
