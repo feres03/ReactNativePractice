@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, TextInput,View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { getAllMovies } from '../services';
+import { getAllMovies} from '../services';
 
 
 function HomeScreen() {
@@ -25,19 +25,19 @@ function HomeScreen() {
             setFilteredMovies(filtered);
         }
     };
-    // Fetch movies and update state
     const fetchMoviesData = async () => {
         try {
-            const films = await getAllMovies();
-            setMovies(films);
-            setFilteredMovies(films)
+          const films = await getAllMovies(); // Retrieve movies from AsyncStorage
+          setMovies(films);
+          setFilteredMovies(films);
         } catch (error) {
-            console.log(error);
+          console.log(error);
         }
-    };
-    useEffect(() => {
-        fetchMoviesData();
-    }, []);
+      };
+
+  useEffect(() => {
+    fetchMoviesData();
+  }, []);
 
     // Navigate to the movie details screen
     const handleMoviePress = (movie) => {
@@ -58,29 +58,26 @@ function HomeScreen() {
     };
 
     return (
-
         <FlatList
-            style={styles.container}
-            ListHeaderComponent={
-                <Pressable style={styles.searchBar}>
-                    <Icon name="search" size={18} style={styles.searchIcon} />
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search movies..."
-                        value={searchQuery}
-                        onChangeText={handleSearch}
-                        flex={1}
-                    />
-                </Pressable>
-            }
-            data={filteredMovies}
-            numColumns={2}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
+          style={styles.container}
+          ListHeaderComponent={(
+            <View style={styles.searchBar}>
+              <Icon name="search" size={18} style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search movies..."
+                value={searchQuery}
+                onChangeText={handleSearch}
+                flex={1}
+              />
+            </View>
+          )}
+          data={filteredMovies}
+          numColumns={2}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
         />
-
-
-    );
+      )
 };
 
 
@@ -136,4 +133,3 @@ const styles = StyleSheet.create({
     },
 
 })
-

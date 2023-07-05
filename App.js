@@ -6,8 +6,8 @@ import HomeScreen from './Screens/HomeScreen';
 import DetailsScreen from './Screens/DetailsScreen';
 import FavouritesScreen from './Screens/FavouriteScreen';
 import HeartIcon from './components/HeartIcon';
-
-import FavouritesContextProvider from './store/context/FavouritesContext';
+import AddMovieScreen from './Screens/AddMovieScreen';
+import PlusIcon from './components/PlusIcon';
 
 export default function App() {
   Stack = createNativeStackNavigator();
@@ -15,25 +15,22 @@ export default function App() {
   return (
     <>
       <StatusBar style='dark' />
-      <FavouritesContextProvider>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{
             headerStyle: { backgroundColor: '#C89F9c' },
             headerTintColor: 'black',
             contentStyle: { backgroundColor: '#3f2f25' },
-            headerRight: () => <HeartIcon />
+            headerRight: () => <HeartIcon />,
+            headerLeft: () => <PlusIcon />
           }} >
             <Stack.Screen name='Home' component={HomeScreen} />
             <Stack.Screen name='Details'>
               {(props) => <DetailsScreen {...props} />}
             </Stack.Screen>
             <Stack.Screen name='Favourites' component={FavouritesScreen} />
+            <Stack.Screen name='AddMovie' component={AddMovieScreen} />
           </Stack.Navigator>
         </NavigationContainer>
-
-
-      </FavouritesContextProvider>
     </>
   );
 }
-
