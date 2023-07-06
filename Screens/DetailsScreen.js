@@ -1,8 +1,7 @@
 import { useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator} from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Pressable} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getMovieDetails } from '../services';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DetailsScreen = () => {
@@ -21,26 +20,20 @@ const DetailsScreen = () => {
       const favourite = favouriteJson ? JSON.parse(favouriteJson) : []
       const found = favourite.some(item=>item.id===movie.id)
       setisFavourite(found)
-      
     } catch (error) {
       console.log(error)
     }
   }
-  
- 
-
   const changeFavouriteStatusHandler = async () => {
     try {
       const storedMovies = await AsyncStorage.getItem('Favourite');
       let moviesData = [];
-  
       if (storedMovies) {
         moviesData = JSON.parse(storedMovies);
         if (!Array.isArray(moviesData)) {
           moviesData = [moviesData];
         }
       }
-  
       // Check if the movie is already in favorites before adding it
       if (!moviesData.some((item) => item.id === movie.id)) {
         moviesData.push(movie);
@@ -51,20 +44,17 @@ const DetailsScreen = () => {
         setisFavourite(false);
         alert('The chosen movie is removed from the Favorites list.');
       }
-  
       await AsyncStorage.setItem('Favourite', JSON.stringify(moviesData));
-     
     } catch (error) {
       console.log(error);
     }
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {movie ? (
         <>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}` }} style={styles.poster} />
+            <Image source={{ uri: movie.picture }} style={styles.poster} />
             <TouchableOpacity onPress={changeFavouriteStatusHandler} style={styles.favoriteIcon}>
               <Ionicons name={isFavourite ? 'heart' : 'heart-outline'} size={28} color="white" />
             </TouchableOpacity>
@@ -91,6 +81,13 @@ const DetailsScreen = () => {
             <Text style={styles.overviewTitle}>Overview</Text>
             <View style={styles.overviewBorder} />
             <Text style={styles.overviewText}>{movie.overview}</Text>
+          </View>
+          <View>
+          <Pressable>
+            <Text>Delete</Text>
+            <Text>Update</Text>
+
+            </Pressable>
           </View>
         </>
       ) : (

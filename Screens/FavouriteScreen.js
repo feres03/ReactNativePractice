@@ -53,7 +53,7 @@ const confirmDelete = async () => {
 };
 
   const renderItem = ({ item }) => {
-    const imageUri = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
+    const imageUri = item.picture
   
     return (
       <Pressable style={styles.gridItem} onPress={()=>handleMoviePress(item)}>
