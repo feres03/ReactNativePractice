@@ -10,9 +10,10 @@ function HeartIcon() {
     };
     return (
         <Pressable onPress={handleHeartPress}>
-            <Icon name="heart" size={22} color="#DE2E4B" style={{ marginRight: 10 }} />
+            <Icon name="heart" size={25} color="#DE2E4B" style={{ marginRight: 15 }} />
         </Pressable>
     )
 }
 
 export default HeartIcon;
+

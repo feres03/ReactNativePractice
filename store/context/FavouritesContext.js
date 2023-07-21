@@ -1,89 +1,62 @@
 import { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getFavouriteMovies } from "../../services";
 
-export const FavouritesContext = createContext({
-  ids: [],
-  movies: [],
-  addFavourite: (id) => {},
-  deleteFavourite: (id) => {},
-});
+export const FavouritesContext = createContext();
 
 function FavouritesContextProvider({ children }) {
-  const [favouritesIds, setFavouritesIds] = useState([]);
-  const [movies, setMovies] = useState([]);
+  const [favouriteMovies, setfavouriteMovies] = useState([]);
 
 
   useEffect(() => {
-    const loadFavouritesIds = async () => {
-      try {
-        const storedIds = await AsyncStorage.getItem("MoviesData");
-        if (storedIds !== null) {
-          setFavouritesIds(JSON.parse(storedIds));
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    loadFavouritesIds();
+    // Retrieve movies from AsyncStorage 
+    loadFavourites();
   }, []);
 
-  useEffect(() => {
-    const saveFavouritesIds = async () => {
-      try {
-        await AsyncStorage.setItem(
-          "favouritesIds",
-          JSON.stringify(favouritesIds)
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    saveFavouritesIds();
-  }, [favouritesIds]);
-
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const films = await getFavouriteMovies(favouritesIds);
-        setMovies(films);
-      } catch (error) {
-        console.log("Error fetching movies:", error);
-      }
-    };
-
-    fetchMovies();
-  }, [favouritesIds]);
-
-  async function addFavourite(id) {
+  const loadFavourites = async () => {
     try {
-      setFavouritesIds((currentFavIds) => [...currentFavIds, id]);
+      const storedFavourites = await AsyncStorage.getItem('Favourite');
+      if (storedFavourites) {
+        setfavouriteMovies(JSON.parse(storedFavourites));
+      }
     } catch (error) {
-      console.log(error);
+      console.log('Error retrieving movies:', error);
     }
-  }
-
-  async function deleteFavourite(id) {
-    try {
-      setFavouritesIds((currentFavIds) =>
-        currentFavIds.filter((movieId) => movieId !== id)
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const value = {
-    ids: favouritesIds,
-    movies: movies,
-    addFavourite: addFavourite,
-    deleteFavourite: deleteFavourite,
   };
 
+  const addFavourite = async (movie) => {
+    try {
+      const storedFavourites = await AsyncStorage.getItem('Favourite');
+      let updatedFavourites = [];
+      if (storedFavourites) {
+        updatedFavourites = JSON.parse(storedFavourites);
+      }
+      updatedFavourites.push(movie);
+      setfavouriteMovies(updatedFavourites); // Update the favourites state
+      await AsyncStorage.setItem('Favourite', JSON.stringify(updatedFavourites));
+    } catch (error) {
+      console.log('Error saving movie:', error);
+    }
+  };
+  
+
+  const deleteFavourite = async (movie) => {
+    try {
+      const storedFavourites = await AsyncStorage.getItem('Favourite');
+      let updatedFavourites = [];
+      if (storedFavourites) {
+        updatedFavourites = JSON.parse(storedFavourites);
+        updatedFavourites = updatedFavourites.filter((item) => item.id !== movie.id);
+        await AsyncStorage.setItem('Favourite', JSON.stringify(updatedFavourites));
+  
+        // Update the state with the updated favourites
+        setfavouriteMovies(updatedFavourites);
+      }
+    } catch (error) {
+      console.log('Error deleting movie:', error);
+    }
+  };
   return (
-    <FavouritesContext.Provider value={value}>
+    <FavouritesContext.Provider value={{addFavourite,deleteFavourite,favouriteMovies}}>
       {children}
     </FavouritesContext.Provider>
   );

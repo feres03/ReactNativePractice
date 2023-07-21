@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AntDesign } from '@expo/vector-icons';
+import MovieContext from '../store/context/MovieContext';
 
 function HomeScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const [movies, setMovies] = useState([]);
+  const { movies,setMovies } = useContext(MovieContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMovies, setFilteredMovies] = useState([]);
- 
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -23,64 +21,25 @@ function HomeScreen() {
       setFilteredMovies(filtered);
     }
   };
-
-
-  const deleteMovie = async (movie) => {
-    const updatedMovies = movies.filter((m) => m !== movie);
-    setMovies(updatedMovies);
-    setFilteredMovies(updatedMovies);
-
-    try {
-      await AsyncStorage.setItem('movies', JSON.stringify(updatedMovies));
-    } catch (error) {
-      console.log('Error saving movies:', error);
-    }
+  const handleDetails = (movie) => {
+    navigation.navigate('Details', { movie });
   };
-
   useEffect(() => {
-    if (route.params?.movie) {
-      const newMovie = route.params.movie;
-      const updatedMovies = [...movies, newMovie];
-      setMovies(updatedMovies);
+    if (route.params?.updatedMovies) {
+      const updatedMovies = route.params.updatedMovies;
+      setMovies(updatedMovies); // Change this line to set the movies state
       setFilteredMovies(updatedMovies);
-
-      try {
-        AsyncStorage.setItem('movies', JSON.stringify(updatedMovies));
-      } catch (error) {
-        console.log('Error saving movies:', error);
-      }
     }
-  }, [route.params?.movie]);
-
+  }, [route.params?.updatedMovies]);
   useEffect(() => {
-    const retrieveMovies = async () => {
-      try {
-        const storedMovies = await AsyncStorage.getItem('movies');
-        if (storedMovies) {
-          const parsedMovies = JSON.parse(storedMovies);
-          setMovies(parsedMovies);
-          setFilteredMovies(parsedMovies);
-        }
-      } catch (error) {
-        console.log('Error retrieving movies:', error);
-      }
-    };
-
-    retrieveMovies();
-  }, []);
+    setFilteredMovies(movies); // Set the initial value of filteredMovies to the movies array
+  }, [movies]);
 
   const renderItem = ({ item }) => {
-    const imageUri = item.picture;
-handleDetails = (movie)=>{
-  console.log("Pressed")
-  navigation.navigate("Details", { movie})
-}
+    const imageUri = item.poster_path;
     return (
-      <Pressable style={styles.gridItem} onPress={()=>{handleDetails(item)}}>
+      <Pressable style={styles.gridItem} onPress={() => handleDetails(item)}>
         <Image style={styles.image} source={{ uri: imageUri }} />
-        <Pressable style={styles.deleteIconContainer} onPress={() => deleteMovie(item)}>
-          <AntDesign name="close" size={18} color="white" />
-        </Pressable>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.average}>{item.vote_average}</Text>
       </Pressable>
@@ -141,14 +100,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 10,
   },
-  deleteIconContainer: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'red',
-    borderRadius: 30,
-    width: 17,
-  },
   gridItem: {
     flex: 1,
     margin: 10,
@@ -164,6 +115,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 180,
+    resizeMode: 'contain',
     borderRadius: 6,
     marginBottom: 10,
   },

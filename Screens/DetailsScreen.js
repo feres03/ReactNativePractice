@@ -1,93 +1,108 @@
-import { useRoute } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Pressable} from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MovieContext from '../store/context/MovieContext';
+import {FavouritesContext} from'../store/context/FavouritesContext' 
 
 const DetailsScreen = () => {
   const route = useRoute();
   const { movie } = route.params;
+  const [isFavourite, setisFavourite] = useState(false);
+  const { deleteMovie } = useContext(MovieContext)
+  const { addFavourite, deleteFavourite } = useContext(FavouritesContext)
 
-  const [isFavourite,setisFavourite]=useState(false)
+  const navigation = useNavigation();
 
   useEffect(() => {
-    checkisFavourite()
-  }, []);
+    checkIsFavourite();
+  }, []); 
 
-  const checkisFavourite = async() =>{
+  const checkIsFavourite = async () => {
     try {
-      const favouriteJson = await AsyncStorage.getItem('Favourite')
-      const favourite = favouriteJson ? JSON.parse(favouriteJson) : []
-      const found = favourite.some(item=>item.id===movie.id)
-      setisFavourite(found)
+      const favouriteJson = await AsyncStorage.getItem('Favourite');
+      const favourite = favouriteJson ? JSON.parse(favouriteJson) : [];
+      const found = favourite.some(item => item.id === movie?.id);
+      setisFavourite(found);
     } catch (error) {
-      console.log(error)
     }
-  }
+  };
   const changeFavouriteStatusHandler = async () => {
     try {
-      const storedMovies = await AsyncStorage.getItem('Favourite');
-      let moviesData = [];
-      if (storedMovies) {
-        moviesData = JSON.parse(storedMovies);
-        if (!Array.isArray(moviesData)) {
-          moviesData = [moviesData];
+      const storedFavourites = await AsyncStorage.getItem('Favourite');
+      let favouritesData = [];
+      if (storedFavourites) {
+        favouritesData = JSON.parse(storedFavourites);
+        if (!Array.isArray(favouritesData)) {
+          favouritesData = [favouritesData];
         }
       }
-      // Check if the movie is already in favorites before adding it
-      if (!moviesData.some((item) => item.id === movie.id)) {
-        moviesData.push(movie);
+  
+      if (!favouritesData.some(item => item.id === movie?.id)) {
+        addFavourite(movie);
         setisFavourite(true);
-        alert('The chosen movie is added to the Favourites list.');
+        alert('The chosen movie is added to the Favorites list.');
       } else {
-        moviesData = moviesData.filter((item) => item.id !== movie.id);
+        deleteFavourite(movie);
         setisFavourite(false);
         alert('The chosen movie is removed from the Favorites list.');
       }
-      await AsyncStorage.setItem('Favourite', JSON.stringify(moviesData));
     } catch (error) {
       console.log(error);
     }
   };
+  
+
+  const handleUpdate = () => {
+    navigation.navigate('Edit', {movie});
+  };
+
+  const handleDelete= async ()=>{
+  try {
+    deleteMovie(movie)
+    navigation.navigate('Home')
+  } catch (error) {
+    console.log('Error deleting movie')
+  }  
+
+  }
+  const date = movie?.release_date.split('T')[0]
+  
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {movie ? (
         <>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: movie.picture }} style={styles.poster} />
+            <Image source={{ uri: movie?.poster_path }} style={styles.poster} />
             <TouchableOpacity onPress={changeFavouriteStatusHandler} style={styles.favoriteIcon}>
               <Ionicons name={isFavourite ? 'heart' : 'heart-outline'} size={28} color="white" />
             </TouchableOpacity>
           </View>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={styles.title}>{movie?.title}</Text>
           </View>
           <View style={styles.detailsContainer}>
-            <Text style={styles.detailsText}>Rating: {movie.vote_average}</Text>
+            <Text style={styles.detailsText}>Rating: {movie?.vote_average}</Text>
             <Text style={styles.detailsText}>
-              Duration: {movie.runtime} minutes | Release Date: {movie.release_date}
+              Release Date: {date}
             </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.genresContainer}>
-                {movie?.genres?.map((genre) => (
-                  <View key={genre.id} style={styles.genre}>
-                    <Text style={styles.genreText}>{genre.name}</Text>
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
           </View>
           <View style={styles.overviewContainer}>
             <Text style={styles.overviewTitle}>Overview</Text>
             <View style={styles.overviewBorder} />
-            <Text style={styles.overviewText}>{movie.overview}</Text>
+            <Text style={styles.overviewText}>{movie?.overview}</Text>
           </View>
-          <View>
-          <Pressable>
-            <Text>Delete</Text>
-            <Text>Update</Text>
-
-            </Pressable>
+          <View style={styles.actionButtonsContainer}>
+            <TouchableOpacity onPress={handleDelete}  style={styles.actionButton}>
+              <Ionicons name="trash" size={28} color="white" />
+              <Text style={styles.actionButtonText}>Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleUpdate} style={styles.actionButton}>
+              <Ionicons name="create" size={28} color="white" />
+              <Text style={styles.actionButtonText}>Update</Text>
+            </TouchableOpacity>
           </View>
         </>
       ) : (
@@ -168,6 +183,30 @@ const styles = StyleSheet.create({
   overviewText: {
     fontSize: 16,
     textAlign: 'justify',
+    margin: 10,
+    flex: 1,
+    backgroundColor: '#EFD7C5',
+  },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    backgroundColor: '#B36A5E',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 8,
+    marginBottom:20,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 8,
   },
   indicator: {
     marginTop: 16,

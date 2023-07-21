@@ -1,32 +1,27 @@
-import React, {useEffect, useState } from "react";
+import React, {useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { FlatList, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons';
+import MovieContext from "../store/context/MovieContext";
 
 function FavouritesScreen() {
   const navigation = useNavigation();
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const {favouriteMovies,deleteFavourite } = useContext(MovieContext);
 
+
+  const isFocused = useIsFocused();
   
-  
-  const fetchMovies = async () => {
-    try {
-      const storedMovies = await AsyncStorage.getItem('Favourite');
-      if (storedMovies) {
-        const moviesData = JSON.parse(storedMovies);
-        setMovies(moviesData);
-      }
-    } catch (error) {
-      console.log('Error fetching movies:', error);
-    }
-  };
+ 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    if (isFocused) {
+      favouriteMovies
+    }
+  }, [isFocused]);
 
   // Navigate to the movie details screen
   const handleMoviePress = (movie) => {
@@ -39,21 +34,19 @@ const deleteMovie = (movie) => {
   setModalVisible(true);
 };
 
-// Confirm delete action
-const confirmDelete = async () => {
-  try {
-    const updatedMovies = movies.filter((movie) => movie.id !== selectedMovie.id);
-    await AsyncStorage.setItem('Favourite', JSON.stringify(updatedMovies));
-    setMovies(updatedMovies);
-    setModalVisible(false);
-    setSelectedMovie(null); // Reset the selected movie after deleting
-  } catch (error) {
-    console.log('Error deleting movie:', error);
-  }
-};
+  // Confirm delete action
+  const confirmDelete = async () => {
+    try {
+      await deleteFavourite(selectedMovie); // Use the deleteFavourite function from the context
+      setModalVisible(false);
+      setSelectedMovie(null); // Reset the selected movie after deleting
+    } catch (error) {
+      console.log('Error deleting movie:', error);
+    }
+  };
 
   const renderItem = ({ item }) => {
-    const imageUri = item.picture
+    const imageUri = item.poster_path
   
     return (
       <Pressable style={styles.gridItem} onPress={()=>handleMoviePress(item)}>
@@ -76,7 +69,7 @@ const confirmDelete = async () => {
         data={movies}
         numColumns={2}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
+        keyExtractor={(item) => item.id}
 
       />
     ) : (

@@ -10,7 +10,7 @@ function PlusIcon() {
     };
     return (
         <Pressable onPress={handleHeartPress}>
-            <Icon name="plus" size={22} color="#DE2E4B" style={{ marginRight: 10 }} />
+            <Icon name="plus" size={24} color="#DE2E4B" style={{ marginLeft: 15 }} />
         </Pressable>
     )
 }
